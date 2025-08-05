@@ -1,0 +1,74 @@
+/**
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership. The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License. You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied. See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+ */
+
+//apply plugin: 'test-report-aggregation'
+
+plugins {
+    id 'test-report-aggregation'
+}
+
+description = 'Aggregate Test Results'
+
+// Declare dependencies using the testReportAggregation configuration
+// (list project results to aggregate here)
+dependencies {
+    // EVERYTHING. Doesn't work because we don't/can't run them all at once.
+    //testReportAggregation fineractJavaProjects
+
+    // FIXME - old project? delete?
+    //testReportAggregation project(':fineract-api')
+
+    // specific projects only (all but e2e) -- this is probably the way to go
+    testReportAggregation project(':fineract-core')
+    testReportAggregation project(':fineract-cob')
+    testReportAggregation project(':fineract-validation')
+    testReportAggregation project(':fineract-command')
+    testReportAggregation project(':fineract-accounting')
+    testReportAggregation project(':fineract-provider')
+    testReportAggregation project(':fineract-branch')
+    testReportAggregation project(':fineract-document')
+    testReportAggregation project(':fineract-investor')
+    testReportAggregation project(':fineract-charge')
+    testReportAggregation project(':fineract-rates')
+    testReportAggregation project(':fineract-tax')
+    testReportAggregation project(':fineract-loan')
+    testReportAggregation project(':fineract-savings')
+    testReportAggregation project(':fineract-report')
+    testReportAggregation project(':integration-tests')
+    testReportAggregation project(':twofactor-tests')
+    testReportAggregation project(':oauth2-tests')
+    testReportAggregation project(':fineract-client')
+    testReportAggregation project(':fineract-avro-schemas')
+    testReportAggregation project(':fineract-progressive-loan')
+    testReportAggregation project(':fineract-progressive-loan-embeddable-schedule-generator')
+}
+
+// Define a report of type AggregateTestReport which collects test data from unit test suites
+reporting {
+    reports {
+        testAggregateTestReport(AggregateTestReport) {
+            testType = TestSuiteType.UNIT_TEST
+        }
+    }
+}
+
+// make aggregate test report generation part of the 'check' lifecycle phase
+//tasks.named('check') {
+//    dependsOn tasks.named('testAggregateTestReport', TestReport)
+//}
