@@ -46,13 +46,12 @@ class InterestPeriodTest {
     private static final CurrencyData USD = new CurrencyData("USD", "US Dollar", 2, 1, "$", "USD");
     private static final Money ZERO = Money.of(USD, BigDecimal.ZERO, MC);
 
-    private static MockedStatic<MoneyHelper> moneyHelper;
-
     @BeforeAll
     static void init() {
-        moneyHelper = Mockito.mockStatic(MoneyHelper.class);
-        moneyHelper.when(MoneyHelper::getRoundingMode).thenReturn(RoundingMode.HALF_EVEN);
-        moneyHelper.when(MoneyHelper::getMathContext).thenReturn(MC);
+        try (MockedStatic<MoneyHelper> moneyHelper = Mockito.mockStatic(MoneyHelper.class)) {
+            moneyHelper.when(MoneyHelper::getRoundingMode).thenReturn(RoundingMode.HALF_EVEN);
+            moneyHelper.when(MoneyHelper::getMathContext).thenReturn(MC);
+        }
     }
 
     @Test
