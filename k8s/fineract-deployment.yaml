@@ -1,0 +1,41 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: fineract
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: fineract
+  template:
+    metadata:
+      labels:
+        app: fineract
+    spec:
+      containers:
+      - name: fineract
+        image: <ACR_LOGIN_SERVER>/fineract:latest  # Remplace par ton serveur ACR
+        ports:
+        - containerPort: 8080
+        env:
+        - name: DB_URL
+          value: "jdbc:mysql://fineract-db-mysql:3306/fineract"
+        - name: DB_USER
+          value: "fineract"
+        - name: DB_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: fineract-db-secret
+              key: password
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: fineract-service
+spec:
+  type: LoadBalancer
+  ports:
+    - port: 80
+      targetPort: 8080
+  selector:
+    app: fineract
