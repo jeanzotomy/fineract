@@ -256,6 +256,41 @@ id -u ${GROUP}
 
 Please make sure that you are not checking in your changed values. The defaults should normally work for most people.
 
+INSTRUCTIONS: How to build and deploy with Dockerfile for AKS
+===================================================
+
+This repository includes a `Dockerfile` at the root level specifically designed for building and deploying Fineract in Azure Kubernetes Service (AKS) environments.
+
+**Prerequisites:**
+1. Build the Fineract JAR file first: `./gradlew clean bootJar`
+2. Ensure Docker is installed and running
+
+**Building the Docker image:**
+```bash
+# Build the Fineract JAR file
+./gradlew clean bootJar
+
+# Build the Docker image
+docker build -t fineract-aks:latest .
+```
+
+**Key features of the AKS Dockerfile:**
+- Based on `azul/zulu-openjdk-alpine:21` for optimal performance and security
+- Runs as non-root user (`nobody:nogroup`) for enhanced security
+- Exposes ports 8080 (HTTP) and 8443 (HTTPS)
+- Supports plugin loading via `/app/plugins/` directory
+- Includes necessary JVM options for optimal performance
+- Compatible with Kubernetes deployments including AKS
+
+**Note:** JDBC drivers for database connectivity should be provided via:
+- Kubernetes ConfigMaps/Secrets
+- Init containers
+- External volume mounts
+- Or by extending this Dockerfile to include specific drivers
+
+**Example Kubernetes deployment:**
+The existing Kubernetes configurations in the `kubernetes/` directory can be used as reference for AKS deployments.
+
 INSTRUCTIONS: How to build documentation
 ===================================================
 
