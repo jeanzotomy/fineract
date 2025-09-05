@@ -16,6 +16,7 @@ jobs:
       uses: actions/setup-java@v3
       with:
         java-version: '11'
+        distribution: 'temurin'  # ou 'adopt', 'zulu', etc. selon vos besoins
 
     - name: Build Fineract JAR
       run: mvn clean package
