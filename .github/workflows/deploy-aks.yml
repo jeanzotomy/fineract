@@ -12,11 +12,14 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v4
 
+    - name: Liste fichiers pour debug
+      run: ls -l
+
     - name: Set up JDK 11
       uses: actions/setup-java@v3
       with:
         java-version: '11'
-        distribution: 'temurin'  # ou 'adopt', 'zulu', etc. selon vos besoins
+        distribution: 'temurin'
 
     - name: Build Fineract JAR
       run: mvn clean package
