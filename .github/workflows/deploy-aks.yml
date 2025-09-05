@@ -1,0 +1,66 @@
+name: Build and Deploy Fineract to AKS
+
+on:
+  push:
+    branches: [main, develop]
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 21
+        uses: actions/setup-java@v4
+        with:
+          java-version: '21'
+          distribution: 'temurin'
+
+      # Si tu veux utiliser Gradle, décommente ces deux étapes et adapte la commande de build :
+      # - name: Set up Gradle
+      #   uses: gradle/gradle-build-action@v2
+      # - name: Build with Gradle
+      #   run: ./gradlew build
+
+      # Version Maven (par défaut)
+      - name: Build Fineract JAR
+        run: mvn clean package
+        working-directory: ./ # Change ce chemin si ton pom.xml n'est pas à la racine
+
+      - name: Login to Azure
+        uses: azure/login@v2
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+      - name: Docker Login to ACR
+        uses: azure/docker-login@v2
+        with:
+          login-server: ${{ secrets.ACR_LOGIN_SERVER }}
+          username: ${{ secrets.ACR_USERNAME }}
+          password: ${{ secrets.ACR_PASSWORD }}
+
+      - name: Build Docker image
+        run: docker build -t ${{ secrets.ACR_LOGIN_SERVER }}/fineract:latest .
+
+      - name: Push Docker image
+        run: docker push ${{ secrets.ACR_LOGIN_SERVER }}/fineract:latest
+
+      - name: Set up kubectl
+        uses: azure/setup-kubectl@v3
+        with:
+          version: 'latest'
+
+      - name: Get AKS credentials
+        uses: azure/aks-set-context@v3
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+          cluster-name: ${{ secrets.AKS_CLUSTER_NAME }}
+          resource-group: ${{ secrets.AKS_RESOURCE_GROUP }}
+
+      - name: Deploy MySQL
+        run: kubectl apply -f k8s/mysql-deployment.yaml
+
+      - name: Deploy Fineract
+        run: kubectl apply -f k8s/fineract-deployment.yaml
